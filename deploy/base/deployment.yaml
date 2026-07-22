@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager-feishu-adapter
+  labels:
+    app.kubernetes.io/name: alertmanager-feishu-adapter
+    app.kubernetes.io/component: notification-adapter
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: 300
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: alertmanager-feishu-adapter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: alertmanager-feishu-adapter
+        app.kubernetes.io/component: notification-adapter
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 20
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: alertmanager-feishu-adapter
+      containers:
+        - name: adapter
+          image: registry.example.invalid/monitoring/alertmanager-feishu-adapter@sha256:0000000000000000000000000000000000000000000000000000000000000000
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LISTEN_ADDRESS
+              value: ":8080"
+            - name: FEISHU_WEBHOOK_FILE
+              value: /var/run/secrets/feishu/webhook-url
+            - name: ADAPTER_AUTH_TOKEN_FILE
+              value: /var/run/secrets/adapter-auth/token
+            - name: FEISHU_REQUEST_TIMEOUT
+              value: 8s
+            - name: SHUTDOWN_TIMEOUT
+              value: 10s
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            failureThreshold: 30
+            periodSeconds: 2
+            timeoutSeconds: 1
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: feishu-webhook
+              mountPath: /var/run/secrets/feishu
+              readOnly: true
+            - name: adapter-auth
+              mountPath: /var/run/secrets/adapter-auth
+              readOnly: true
+      volumes:
+        - name: feishu-webhook
+          secret:
+            secretName: alertmanager-feishu-webhook
+            defaultMode: 0440
+            items:
+              - key: url
+                path: webhook-url
+        - name: adapter-auth
+          secret:
+            secretName: feishu-adapter-auth
+            defaultMode: 0440
+            items:
+              - key: token
+                path: token

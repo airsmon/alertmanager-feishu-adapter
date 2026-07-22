@@ -1,0 +1,13 @@
+.gocache/
+.secrets/
+.env
+.env.*
+.DS_Store
+.idea/
+.vscode/
+bin/
+dist/
+*.log
+*.tar
+*.test
+coverage.out

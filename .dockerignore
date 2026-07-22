@@ -1,0 +1,14 @@
+.git
+.github
+.gitignore
+.gocache
+.secrets
+.env
+.env.*
+bin
+dist
+deploy
+README.md
+*.log
+*.tar
+coverage.out

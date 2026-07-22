@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring
+resources:
+  - ../base
+  - pdb.yaml
+images:
+  - name: registry.example.invalid/monitoring/alertmanager-feishu-adapter
+    newName: docker.io/airsmon/alertmanager-feishu-adapter
+    digest: sha256:6e390b239c51fe3a36cb96d2faaa56b20f305d32286ba4fa479015d8ae768a1e
+replicas:
+  - name: alertmanager-feishu-adapter
+    count: 2

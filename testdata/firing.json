@@ -1,0 +1,56 @@
+{
+  "version": "4",
+  "groupKey": "{}:{alertname=\"DeviceOutputVoltageLow\", namespace=\"monitoring\"}",
+  "truncatedAlerts": 0,
+  "status": "firing",
+  "receiver": "feishu",
+  "groupLabels": {
+    "alertname": "DeviceOutputVoltageLow",
+    "namespace": "monitoring"
+  },
+  "commonLabels": {
+    "alertname": "DeviceOutputVoltageLow",
+    "namespace": "monitoring",
+    "severity": "critical"
+  },
+  "commonAnnotations": {
+    "summary": "UPS 输出电压过低"
+  },
+  "externalURL": "https://prometheus.example.com/alertmanager",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "DeviceOutputVoltageLow",
+        "severity": "critical",
+        "namespace": "monitoring",
+        "datacenter": "DC-A",
+        "device": "UPS-A",
+        "equip_id": "device-1",
+        "exported_instance": "UPS-A",
+        "rack": "RACK-01",
+        "aisle": "cold",
+        "position": "row-1",
+        "phase": "L1",
+        "pod": "device-exporter-7d8f9c6b5-x2k4m",
+        "container": "exporter",
+        "deployment": "device-exporter",
+        "node": "worker-01",
+        "service": "device-exporter",
+        "endpoint": "http",
+        "job": "device-exporter",
+        "instance": "192.0.2.10:8080"
+      },
+      "annotations": {
+        "summary": "UPS 输出电压过低，<at user_id=all>请处理</at>",
+        "description": "UPS-A 当前输出电压低于告警阈值，请检查设备负载和输入电源。",
+        "dashboard_url": "https://grafana.example.com/d/devices?var-device=UPS-A",
+        "runbook_url": "http://runbook.example.com/devices"
+      },
+      "startsAt": "2026-07-22T05:45:32Z",
+      "endsAt": "2026-07-22T08:00:00Z",
+      "generatorURL": "https://prometheus.example.com/graph?g0.expr=device_output_voltage",
+      "fingerprint": "abcdef0123456789"
+    }
+  ]
+}
